@@ -4,7 +4,7 @@ Este projeto é um gerenciador de tarefas semanais com autenticação de usuári
 
 ## Funcionalidades
 
-- Cadastro e login de usuários com autenticação segura.
+- Cadastro e login de usuários.
 - Adição de tarefas por dia da semana.
 - Remoção de tarefas com modo interativo.
 - Visualização das tarefas separadas por dias.
