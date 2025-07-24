@@ -20,7 +20,5 @@ Este projeto é um gerenciador de tarefas semanais com autenticação de usuári
 
 ## Execução Local
 
-Para rodar o projeto localmente, utilize o servidor embutido do PHP:
-
 ```bash
 php -S localhost:8000
