@@ -12,7 +12,7 @@
             <h1>Tarefas Semanais</h1>
             <div class="header-buttons">
                 <?php if (isset($_SESSION['user_id'])): ?>
-                    <span>Olá, <?php echo htmlspecialchars($_SESSION['username']); ?>!</span>
+                    <span>Olá, <?php echo $_SESSION['username']; ?>!</span>
                     <button class="btn-primary" onclick="showAddTaskModal()">Adicionar</button>
                     <button class="btn-secondary" onclick="toggleRemoveMode()">Remover</button>
                     <a href="?action=logout" class="btn-danger">Logout</a>
@@ -55,7 +55,6 @@
         </main>
     </div>
 
-    <!-- Modal para adicionar tarefa -->
     <div id="addTaskModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeAddTaskModal()">&times;</span>

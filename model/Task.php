@@ -2,27 +2,28 @@
 require_once 'Database.php';
 
 class Task {
-    private $collection;
+    private $pdo;
     
     public function __construct() {
-        $database = new Database();
-        $this->collection = $database->getCollection('tasks');
+        $this->pdo = Database::getConnection();
     }
     
     public function create($userId, $taskName, $dayOfWeek) {
-        return $this->collection->insertOne([
-            'user_id' => $userId,
-            'task_name' => $taskName,
-            'day_of_week' => $dayOfWeek
-        ]);
+        $stmt = $this->pdo->prepare("INSERT INTO tasks (user_id, task_name, day_of_week) VALUES (?, ?, ?)");
+        $stmt->execute([$userId, $taskName, $dayOfWeek]);
+        return $this->pdo->lastInsertId();
     }
     
     public function getByUserId($userId) {
-        return $this->collection->find(['user_id' => $userId]);
+        $stmt = $this->pdo->prepare("SELECT * FROM tasks WHERE user_id = ?");
+        $stmt->execute([$userId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     
     public function delete($taskId, $userId) {
-        return $this->collection->deleteOne(['id' => $taskId]) > 0;
+        $stmt = $this->pdo->prepare("DELETE FROM tasks WHERE id = ? AND user_id = ?");
+        $stmt->execute([$taskId, $userId]);
+        return $stmt->rowCount() > 0;
     }
 }
 ?>

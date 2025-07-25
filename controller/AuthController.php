@@ -77,48 +77,30 @@ class AuthController {
     }
     
     public function login() {
-        $username = $_POST['username'];
-        $password = $_POST['password'];
-        
-        $user = $this->userModel->authenticate($username, $password);
+        $user = $this->userModel->authenticate($_POST['username'], $_POST['password']);
         
         if ($user) {
-            // CORREÇÃO: Usar 'id' em vez de '_id'
-            $_SESSION['user_id'] = (string)$user['id'];
+            $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
-            
-            // DEBUG: Verificar se a sessão foi salva
-            error_log("Login successful - User ID: " . $_SESSION['user_id'] . " Username: " . $_SESSION['username']);
-            
             header('Location: /');
-            exit;
         } else {
             echo "<script>alert('Credenciais inválidas!'); window.location.href='?action=login';</script>";
         }
     }
     
     public function register() {
-        $username = $_POST['username'];
-        $password = $_POST['password'];
-        
-        if (empty($username) || empty($password)) {
-            echo "<script>alert('Preencha todos os campos!'); window.location.href='?action=register';</script>";
-            return;
-        }
-        
-        $userId = $this->userModel->create($username, $password);
+        $userId = $this->userModel->create($_POST['username'], $_POST['password']);
         
         if ($userId) {
             echo "<script>alert('Usuário cadastrado com sucesso!'); window.location.href='?action=login';</script>";
         } else {
-            echo "<script>alert('Usuário já existe ou erro no cadastro!'); window.location.href='?action=register';</script>";
+            echo "<script>alert('Usuário já existe!'); window.location.href='?action=register';</script>";
         }
     }
     
     public function logout() {
         session_destroy();
         header('Location: /');
-        exit;
     }
 }
 ?>

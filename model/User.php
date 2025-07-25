@@ -2,67 +2,28 @@
 require_once 'Database.php';
 
 class User {
-    private $collection;
+    private $pdo;
     
     public function __construct() {
-        $database = new Database();
-        $this->collection = $database->getCollection('users');
+        $this->pdo = Database::getConnection();
     }
     
     public function create($username, $password) {
-        // Verificar se campos não estão vazios
-        if (empty($username) || empty($password)) {
-            return false;
-        }
+        $stmt = $this->pdo->prepare("SELECT id FROM users WHERE username = ?");
+        $stmt->execute([$username]);
+        if ($stmt->fetch()) return false;
         
-        // Verificar se usuário já existe
-        $existingUser = $this->collection->findOne(['username' => $username]);
-        
-        if ($existingUser) {
-            return false;
-        }
-        
-        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-        
-        try {
-            $userId = $this->collection->insertOne([
-                'username' => $username,
-                'password' => $hashedPassword
-            ]);
-            
-            return $userId;
-        } catch (Exception $e) {
-            error_log("Error creating user: " . $e->getMessage());
-            return false;
-        }
+        $stmt = $this->pdo->prepare("INSERT INTO users (username, password) VALUES (?, ?)");
+        $stmt->execute([$username, password_hash($password, PASSWORD_DEFAULT)]);
+        return $this->pdo->lastInsertId();
     }
     
     public function authenticate($username, $password) {
-        if (empty($username) || empty($password)) {
-            return false;
-        }
+        $stmt = $this->pdo->prepare("SELECT * FROM users WHERE username = ?");
+        $stmt->execute([$username]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
         
-        try {
-            $user = $this->collection->findOne(['username' => $username]);
-            
-            if ($user && password_verify($password, $user['password'])) {
-                return $user;
-            }
-            
-            return false;
-        } catch (Exception $e) {
-            error_log("Error authenticating user: " . $e->getMessage());
-            return false;
-        }
-    }
-    
-    public function findById($id) {
-        try {
-            return $this->collection->findOne(['id' => $id]);
-        } catch (Exception $e) {
-            error_log("Error finding user by ID: " . $e->getMessage());
-            return false;
-        }
+        return $user && password_verify($password, $user['password']) ? $user : false;
     }
 }
 ?>
